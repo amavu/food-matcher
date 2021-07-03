@@ -53,7 +53,7 @@ const App = () => {
       <div style={{ height: "1000px", width: "100%" }}>
         <GoogleMapReact
           bootstrapURLKeys={{
-            key: "AIzaSyB21mHghywEiToAIZ61A47lnTT48uyum4E",
+            key: `${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`,
             libraries: "places",
           }}
           defaultCenter={defaultCenter}
