@@ -4,6 +4,7 @@ import GoogleMapReact from "google-map-react";
 import { Marker } from "./Components/Marker";
 import { RestaurantMatcher } from "./Components/RestaurantMatcher";
 import { GoogleMapsLoader } from "./Components/GoogleMapsLoader";
+import { RestaurantList } from "./Components/RestaurantList/RestaurantList";
 
 const App = () => {
   const defaultCenter = {
@@ -12,9 +13,15 @@ const App = () => {
   };
   const [restaurants, setRestaurants] = useState([]);
   const [currentPosition, setCurrentPosition] = useState(defaultCenter);
-  const [chosenRestaurant, setChosenRestaurant] = useState();
 
   const [placesService, setPlacesService] = useState();
+
+  const ViewState = {
+    FoodMatcher: "food-matcher",
+    FoodList: "food-list",
+  };
+
+  const [viewState, setViewState] = useState(ViewState.FoodList);
 
   useEffect(() => {
     if (placesService) {
@@ -25,9 +32,13 @@ const App = () => {
 
   const defaultRequest = {
     location: currentPosition,
-    radius: "2000",
+    radius: "1000",
     type: "restaurant",
     query: "mexican OR sushi OR kebab OR indian OR pizza OR burger",
+  };
+
+  const handleViewChange = (view) => {
+    setViewState(view);
   };
 
   const handleApiLoaded = (map, maps) => {
@@ -48,9 +59,42 @@ const App = () => {
     setRestaurants(results);
   };
 
-  const handleRestaurantClick = (restaurant) => {
-    setChosenRestaurant(restaurant);
-    console.log(restaurant);
+  const switchView = () => {
+    switch (viewState) {
+      case ViewState.FoodMatcher:
+        return <RestaurantMatcher restaurants={restaurants} />;
+      case ViewState.FoodList:
+        return (
+          <div style={{ height: "700px", display: "flex", width: "100%" }}>
+            <GoogleMapReact
+              bootstrapURLKeys={{
+                key: `${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`,
+                libraries: "places",
+              }}
+              defaultCenter={defaultCenter}
+              center={currentPosition}
+              defaultZoom={12}
+            >
+              <Marker
+                lat={currentPosition.lat}
+                lng={currentPosition.lng}
+                text="My Marker"
+              />
+              {restaurants.map((restaurant, index) => (
+                <Marker
+                  key={index}
+                  lat={restaurant.geometry.location.toJSON().lat}
+                  lng={restaurant.geometry.location.toJSON().lng}
+                  text={restaurant.name}
+                />
+              ))}
+            </GoogleMapReact>
+            <RestaurantList restaurants={restaurants} />
+          </div>
+        );
+      default:
+        return <div>Choose something</div>;
+    }
   };
 
   return (
@@ -60,40 +104,15 @@ const App = () => {
         handleApiLoaded={handleApiLoaded}
         currentPosition={currentPosition}
       />
-      <div style={{ height: "700px", display: "flex", width: "100%" }}>
-        <GoogleMapReact
-          bootstrapURLKeys={{
-            key: `${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`,
-            libraries: "places",
-          }}
-          defaultCenter={defaultCenter}
-          center={currentPosition}
-          defaultZoom={12}
-        >
-          <Marker
-            lat={currentPosition.lat}
-            lng={currentPosition.lng}
-            text="My Marker"
-          />
-          {restaurants.map((restaurant, index) => (
-            <Marker
-              key={index}
-              lat={restaurant.geometry.location.toJSON().lat}
-              lng={restaurant.geometry.location.toJSON().lng}
-              text={restaurant.name}
-            />
-          ))}
-        </GoogleMapReact>
-        <ul>
-          <h2>{chosenRestaurant && chosenRestaurant.name}</h2>
-          {restaurants.map((restaurant, index) => (
-            <li key={index} onClick={() => handleRestaurantClick(restaurant)}>
-              {restaurant.name}
-            </li>
-          ))}
-        </ul>
+      <div>
+        <button onClick={() => handleViewChange(ViewState.FoodMatcher)}>
+          Food Matcher
+        </button>
+        <button onClick={() => handleViewChange(ViewState.FoodList)}>
+          Restaurant List
+        </button>
       </div>
-      <RestaurantMatcher restaurants={restaurants} />
+      {switchView()}
     </div>
   );
 };
