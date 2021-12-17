@@ -96,7 +96,7 @@ const App = () => {
               <Marker
                 lat={currentPosition.lat}
                 lng={currentPosition.lng}
-                text="My Marker"
+                text="Im here"
               />
               {restaurants.map((restaurant, index) => (
                 <Marker
