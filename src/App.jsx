@@ -5,6 +5,7 @@ import { Marker } from "./Components/Marker";
 import { RestaurantMatcher } from "./Components/RestaurantMatcher";
 import { GoogleMapsLoader } from "./Components/GoogleMapsLoader";
 import { RestaurantList } from "./Components/RestaurantList/RestaurantList";
+import { FilterCheckBox } from "./Components/FilterCheckBox";
 
 const App = () => {
   const defaultCenter = {
@@ -13,7 +14,7 @@ const App = () => {
   };
   const [restaurants, setRestaurants] = useState([]);
   const [currentPosition, setCurrentPosition] = useState(defaultCenter);
-
+  const [searchList, setSearchList] = useState([]);
   const [placesService, setPlacesService] = useState();
 
   const ViewState = {
@@ -24,17 +25,19 @@ const App = () => {
   const [viewState, setViewState] = useState(ViewState.FoodList);
 
   useEffect(() => {
-    if (placesService) {
+    if (placesService && defaultRequest.query !== "") {
       placesService.textSearch(defaultRequest, handleRestaurantsResults);
+    } else {
+      setRestaurants([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPosition]);
+  }, [currentPosition, searchList]);
 
   const defaultRequest = {
     location: currentPosition,
     radius: "1000",
     type: "restaurant",
-    query: "mexican OR sushi OR kebab OR indian OR pizza OR burger",
+    query: searchList.join(" OR "),
   };
 
   const handleViewChange = (view) => {
@@ -51,12 +54,27 @@ const App = () => {
       });
       const service = new maps.places.PlacesService(map);
       setPlacesService(service);
-      service.textSearch(defaultRequest, handleRestaurantsResults);
+      if (defaultRequest.query !== "") {
+        service.textSearch(defaultRequest, handleRestaurantsResults);
+      }
     }
   };
 
   const handleRestaurantsResults = (results) => {
     setRestaurants(results);
+  };
+
+  const handleAddToSearchList = (searchString) => {
+    if (searchList.length < 1) {
+      setSearchList([searchString]);
+    } else {
+      let newSearchList = searchList;
+      setSearchList(newSearchList.concat(searchString));
+    }
+  };
+
+  const handleRemoveFromSearchList = (searchElement) => {
+    setSearchList(searchList.filter((item) => item !== searchElement));
   };
 
   const switchView = () => {
@@ -78,7 +96,7 @@ const App = () => {
               <Marker
                 lat={currentPosition.lat}
                 lng={currentPosition.lng}
-                text="My Marker"
+                text="I'm here"
               />
               {restaurants.map((restaurant, index) => (
                 <Marker
@@ -105,6 +123,33 @@ const App = () => {
         currentPosition={currentPosition}
       />
       <div>
+        <div>
+          <div>
+            <FilterCheckBox
+              name={"Burger"}
+              filterAdd={handleAddToSearchList}
+              filterRemove={handleRemoveFromSearchList}
+            />
+
+            <FilterCheckBox
+              name={"Sushi"}
+              filterAdd={handleAddToSearchList}
+              filterRemove={handleRemoveFromSearchList}
+            />
+
+            <FilterCheckBox
+              name={"Pizza"}
+              filterAdd={handleAddToSearchList}
+              filterRemove={handleRemoveFromSearchList}
+            />
+
+            <FilterCheckBox
+              name={"Kebab"}
+              filterAdd={handleAddToSearchList}
+              filterRemove={handleRemoveFromSearchList}
+            />
+          </div>
+        </div>
         <button onClick={() => handleViewChange(ViewState.FoodMatcher)}>
           Food Matcher
         </button>

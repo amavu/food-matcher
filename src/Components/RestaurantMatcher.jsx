@@ -6,6 +6,9 @@ export const RestaurantMatcher = ({ restaurants }) => {
   const [tinderedRestaurant, setTinderedRestaurant] = useState();
 
   const iFeelLucky = () => {
+    if (restaurants.length === 0) {
+      return;
+    }
     const randomNumber = Math.floor(Math.random() * restaurants.length);
     const randomRestaurant = restaurants[randomNumber];
 
