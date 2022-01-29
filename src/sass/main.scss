@@ -1,0 +1,12 @@
+@import 'mixin'; 
+
+@font-face {
+    font-family: "KG No Regrets";
+    src: url("../fonts/kg-no-regrets.ketch.ttf") format("truetype");
+}
+
+.header-container {
+    h1 {
+        @include header-text;
+    }
+}

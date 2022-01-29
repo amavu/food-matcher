@@ -1,0 +1,12 @@
+@font-face {
+  font-family: "KG No Regrets";
+  src: url("../fonts/kg-no-regrets.ketch.ttf") format("truetype");
+}
+.header-container h1 {
+  font-family: "KG No Regrets", Fallback, sans-serif;
+  font-weight: 250;
+  font-size: 80px;
+  text-align: center;
+}
+
+/*# sourceMappingURL=index.css.map */

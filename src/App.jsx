@@ -117,7 +117,9 @@ const App = () => {
 
   return (
     <div>
-      <h1>Food Matcher</h1>
+      <div className="header-container">
+        <h1>FOOD MATCHER</h1>
+      </div>
       <GoogleMapsLoader
         handleApiLoaded={handleApiLoaded}
         currentPosition={currentPosition}

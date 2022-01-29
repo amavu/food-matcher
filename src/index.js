@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
+import "./sass/index.css";
+import "./sass/normalize.css";
+import "./fonts/kg-no-regrets.ketch.ttf";
 import App from "./App";
 
 ReactDOM.render(
